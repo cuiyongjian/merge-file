@@ -1,0 +1,98 @@
+#!/usr/bin/env node
+
+var path = require('path')
+
+var argv = require('yargs')
+    .option('path', {
+        alias: 'p',
+        describe: 'set the source file, support multiple files',
+        demand: true,
+        type: 'array'
+    })
+    .option('dest', {
+        alias: 'd',
+        describe: 'set the destination path',
+        default: './result',
+        demand: false
+    })
+    .usage('Usage: mfile [options] result.txt')
+    .help('h')
+    .alias('h', 'help')
+    .epilog('copyright sheldon 2016')
+    .example('mfile -p *.txt -d ')
+    .argv
+
+// console.log(process.cwd()) // 启动该程序的目录
+// console.log('dirname', __dirname) // 当前代码所在目录
+// console.log('path', argv.p) // -p的参数
+// console.log('dest', argv.d) // -d的参数
+// console.log('argv_', argv._) // 额外的参数
+
+var destPath = path.resolve(__dirname, argv.d)
+
+var sourcePaths = argv.p.map(function (item) {
+    var sourcePath = item
+    if (path.isAbsolute(item)) {
+        // 绝对路径，直接读
+        sourcePath = item
+    }
+    else {
+        // 改成绝对路径
+        sourcePath = path.resolve(__dirname, item)
+    }
+    // console.log('resultPath', sourcePath)
+    return sourcePath
+})
+
+
+
+var glob = require('glob')
+var fs = require('fs')
+
+
+var doAsyncMethod = function (item) {
+    // console.log('异步操作来了', item)
+    var p = new Promise(function (resolve, reject) {
+        // console.log('要解析路径了', item)
+        glob(item, function (err, files) {
+            // console.log('glob解析成功了', files)
+            if (err) {
+                console.log('ERROR:', err.message)
+            }
+            else {
+                // var filebuffers = files.map(function (f) {
+                //     return fs.readFileSync(f)
+                // })
+                // var fullBuffer = new Buffer()
+                // filebuffers.forEach(function (b) {
+                //     fullBuffer.concat(b)
+                // })
+                // resolve(filebuffers)
+                resolve(files)
+            }
+        })
+    })
+    return p
+}
+
+var myPromises = []
+sourcePaths.forEach(function (item) {
+    myPromises.push(doAsyncMethod(item))
+})
+
+Promise.all(myPromises).then(function (rel) {
+    // console.log('完成了所有异步操作', rel)
+    rel.forEach(function (item) {
+        item.forEach(function (f) {
+            // console.log('写出：', f)
+            var s = fs.readFileSync(f)
+            // console.log('读到', s.toString())
+            fs.appendFileSync(destPath, s)
+        })
+    })
+})
+
+
+
+// console.log(path.isAbsolute(argv.p))
+

@@ -1,0 +1,31 @@
+{
+  "name": "merge-file",
+  "version": "1.0.0",
+  "description": "merge multi files into one",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "mfile": "bin/mfile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cuiyongjian/merge-file.git"
+  },
+  "keywords": [
+    "merge",
+    "file"
+  ],
+  "author": "sheldon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cuiyongjian/merge-file/issues"
+  },
+  "homepage": "https://github.com/cuiyongjian/merge-file#readme",
+  "dependencies": {
+    "commander": "^2.9.0",
+    "glob": "^7.1.1",
+    "yargs": "^6.6.0"
+  }
+}
